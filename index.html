@@ -5,8 +5,8 @@
 #hud{position:fixed;inset:0;pointer-events:none;color:#252a30;text-shadow:0 1px 2px #fff}#top{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;gap:8px;font-weight:bold;letter-spacing:1px;background:rgba(255,255,255,.8);border:1px solid #d6dcdf;padding:9px 12px;color:#30383d;box-shadow:0 2px 8px #0000000d}#cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:23px;color:#252a30}#bottom{position:absolute;bottom:14px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:end}#bottom>div{background:rgba(255,255,255,.88);border:1px solid #d6dcdf;color:#252a30;padding:9px 12px;box-shadow:0 2px 8px #0000000d}#ammo{font-size:24px;font-weight:bold;color:#e60012}#help{color:#30383d;line-height:1.6;text-align:right;background:rgba(255,255,255,.88);border:1px solid #d6dcdf;padding:9px 12px;box-shadow:0 2px 8px #0000000d;text-shadow:none}#toast{position:absolute;top:22%;width:100%;text-align:center;color:#e60012;font-size:24px;font-weight:bold;letter-spacing:2px}
 #overlay{position:fixed;inset:0;background:rgba(245,248,249,.96);display:grid;place-items:center;text-align:center;z-index:5}.panel{max-width:650px;padding:35px;background:#fff;border:2px solid #d7dfe2;box-shadow:0 12px 40px #aab5bb55;transform:none}h1{font-size:clamp(48px,10vw,90px);letter-spacing:5px;margin:0;color:#e60012;text-shadow:none}p{color:#28344b;line-height:1.7}button{background:#e60012;border:0;color:white;padding:14px 28px;font-weight:bold;letter-spacing:2px;cursor:pointer;font-size:15px;box-shadow:none}
 </style></head><body>
-<div id="overlay"><div class="panel"><h1>ZERO SECOND</h1><p>TIME ONLY MOVES WHEN YOU DO.<br>Three connected combat zones. One mistake kills.</p><p><b>WASD</b> move · <b>MOUSE</b> look · <b>CLICK</b> fire · <b>R</b> reload · <b>SHIFT</b> sprint<br>Stand still to freeze enemies and bullets. Looking around is free.</p><button id="start">ENTER THE FACILITY</button></div></div>
-<div id="hud"><div id="top"><span>ZERO SECOND</span><span id="room">SECTOR 01 — ENTRY</span><span id="clock">SIM 00.00</span><span id="left">HOSTILES: 0</span></div><div id="cross">+</div><div id="toast"></div><div id="bottom"><div><div style="font-size:11px;letter-spacing:3px;color:#aaa">SERVICE PISTOL</div><div id="ammo">12 / 60</div></div><div id="help">WASD MOVE · SHIFT SPRINT<br>CLICK FIRE · R RELOAD · ESC PAUSE</div></div></div>
+<div id="overlay"><div class="panel"><h1>ZERO SECOND</h1><p>TIME ONLY MOVES WHEN YOU DO.<br>Three connected combat zones. One mistake kills.</p><p><b>WASD</b> move · <b>MOUSE</b> look · <b>E</b> pick up · <b>F</b> throw · <b>CLICK</b> fire · <b>R</b> reload<br>Start empty. Grab objects, throw them, and steal guns. Time freezes when you stop.</p><button id="start">ENTER THE FACILITY</button></div></div>
+<div id="hud"><div id="top"><span>ZERO SECOND</span><span id="room">SECTOR 01 — ENTRY</span><span id="clock">SIM 00.00</span><span id="left">HOSTILES: 0</span></div><div id="cross">+</div><div id="toast"></div><div id="bottom"><div><div id="weaponName" style="font-size:11px;letter-spacing:3px;color:#777">EMPTY HANDS</div><div id="ammo">NO WEAPON</div></div><div id="help">WASD MOVE · E PICK UP · F THROW<br>CLICK FIRE · R RELOAD · ESC PAUSE</div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 (()=>{
@@ -34,9 +34,9 @@ for(const x of [-5,5,15,25,35,45]){block(x,1.1,5,1.1,2.2,.8,dark);block(x,2.25,5
 for(const x of [2,22,42]){block(x,1.35,-6,2.2,2.7,.35,steel);for(let j=0;j<4;j++)block(x-0.7+j*.45,1.45,-5.78,.22,.08,.04,red)}
 // wall-mounted warning stripes
 for(const x of [-6,14,34])for(let i=0;i<5;i++)block(x+i*.45,.12,-7.73,.22,.12,.025,red);
-const gun=new THREE.Group();const gunBody=new THREE.Mesh(new THREE.BoxGeometry(.19,.16,.52),M(0x252a30,.65,.05));gunBody.position.set(.34,-.29,-.54);gun.add(gunBody);const slide=new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.38),M(0x353a40,.55,.2));slide.position.set(.34,-.22,-.56);gun.add(slide);const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.3,12),M(0x15191d,.35,.7));barrel.rotation.x=Math.PI/2;barrel.position.set(.34,-.25,-.88);gun.add(barrel);const grip=new THREE.Mesh(new THREE.BoxGeometry(.13,.25,.16),M(0x191d22));grip.position.set(.34,-.45,-.42);grip.rotation.x=-.2;gun.add(grip);camera.add(gun);scene.add(camera);
+const gun=new THREE.Group();const gunBody=new THREE.Mesh(new THREE.BoxGeometry(.19,.16,.52),M(0x252a30,.65,.05));gunBody.position.set(.34,-.29,-.54);gun.add(gunBody);const slide=new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.38),M(0x353a40,.55,.2));slide.position.set(.34,-.22,-.56);gun.add(slide);const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.3,12),M(0x15191d,.35,.7));barrel.rotation.x=Math.PI/2;barrel.position.set(.34,-.25,-.88);gun.add(barrel);const grip=new THREE.Mesh(new THREE.BoxGeometry(.13,.25,.16),M(0x191d22));grip.position.set(.34,-.45,-.42);grip.rotation.x=-.2;gun.add(grip);camera.add(gun);gun.visible=false;scene.add(camera);
 // Enemies are built from separate articulated pieces, not single boxes.
-const enemies=[],projectiles=[];const bulletGeo=new THREE.CylinderGeometry(.075,.075,1.35,6),enemyBulletMat=new THREE.MeshBasicMaterial({color:0xe60012}),playerBulletMat=new THREE.MeshBasicMaterial({color:0xe60012});
+const enemies=[],projectiles=[],worldItems=[],thrownItems=[];const bulletGeo=new THREE.CylinderGeometry(.055,.055,2.35,8),enemyBulletMat=new THREE.MeshBasicMaterial({color:0xe00016}),playerBulletMat=new THREE.MeshBasicMaterial({color:0xe00016});let heldItem=null,weapon=null,weaponAmmo=0,weaponReserve=0;
 function limb(parent,material,x,y,z,w,h,d){const p=new THREE.Group();p.position.set(x,y,z);const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);mesh.position.y=-h/2;mesh.castShadow=true;p.add(mesh);parent.add(p);return p}
 function makeEnemy(x,z,type='RIFLEMAN'){
  const g=new THREE.Group();const torso=new THREE.Mesh(new THREE.BoxGeometry(.58,.78,.32),uniform);torso.position.y=1.12;torso.castShadow=true;g.add(torso);
@@ -44,17 +44,51 @@ function makeEnemy(x,z,type='RIFLEMAN'){
  const head=new THREE.Mesh(new THREE.SphereGeometry(.23,14,12),skin);head.position.y=1.72;head.castShadow=true;g.add(head);
  const helmet=new THREE.Mesh(new THREE.SphereGeometry(.255,8,6,0,Math.PI*2,0,Math.PI/2),uniform);helmet.position.y=1.78;g.add(helmet);
  const face=new THREE.Mesh(new THREE.BoxGeometry(.29,.09,.035),uniform);face.position.set(0,1.69,.205);g.add(face);
- const armL=limb(g,uniform,-.39,1.42,0,.19,.62,.2),armR=limb(g,uniform,.39,1.42,0,.19,.62,.2);
- const legL=limb(g,pants,-.18,.76,0,.23,.72,.25),legR=limb(g,pants,.18,.76,0,.23,.72,.25);
+ const armL=limb(g,uniform,-.39,1.48,0,.2,.66,.22),armR=limb(g,uniform,.39,1.48,0,.2,.66,.22);
+ const elbowL=limb(armL,uniform,0,-.48,.01,.17,.38,.18),elbowR=limb(armR,uniform,0,-.48,.01,.17,.38,.18);
+ const legL=limb(g,pants,-.18,.78,0,.24,.48,.27),legR=limb(g,pants,.18,.78,0,.24,.48,.27);
+ const kneeL=limb(legL,pants,0,-.38,.015,.22,.42,.25),kneeR=limb(legR,pants,0,-.38,.015,.22,.42,.25);
  const bootL=new THREE.Mesh(new THREE.BoxGeometry(.25,.13,.38),dark);bootL.position.set(-.18,.08,.08);g.add(bootL);const bootR=bootL.clone();bootR.position.x=.18;g.add(bootR);
  const rifle=new THREE.Group();const rb=new THREE.Mesh(new THREE.BoxGeometry(.13,.13,.72),dark);rb.position.z=.15;rifle.add(rb);const barrel2=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.42,6),dark);barrel2.rotation.x=Math.PI/2;barrel2.position.z=.68;rifle.add(barrel2);const stock=new THREE.Mesh(new THREE.BoxGeometry(.16,.19,.24),dark);stock.position.z=-.28;rifle.add(stock);rifle.position.set(.12,1.28,.28);g.add(rifle);
- g.position.set(x,0,z);g.traverse(o=>{if(o.isMesh){o.material=uniform;}});scene.add(g);enemies.push({g,alive:true,type,armL,armR,legL,legR,rifle,fire:1.3+Math.random()*1.7,phase:Math.random()*6,move:0,room:Math.floor((x+8)/20)});return g
+ g.position.set(x,0,z);scene.add(g);enemies.push({g,alive:true,type,armL,armR,legL,legR,elbowL,elbowR,kneeL,kneeR,rifle,fire:1.3+Math.random()*1.7,phase:Math.random()*6,move:0,room:Math.floor((x+8)/20)});return g
 }
 makeEnemy(-4,-5,'GUARD');makeEnemy(4,-4,'RIFLEMAN');makeEnemy(2,5,'GUARD');makeEnemy(16,-4,'RIFLEMAN');makeEnemy(24,4,'HEAVY');makeEnemy(36,-4,'SNIPER');makeEnemy(44,4,'HUNTER');makeEnemy(40,-6,'RIFLEMAN');
+// Scavengeable props: the player begins with absolutely nothing.
+function makePickup(kind,x,z){
+ const g=new THREE.Group();let mat,geo;
+ if(kind==='brick'){mat=M(0xb8bec2);geo=new THREE.BoxGeometry(.48,.25,.3)}
+ else if(kind==='bottle'){mat=M(0x4e9b9c,.25);geo=new THREE.CylinderGeometry(.09,.12,.42,8)}
+ else if(kind==='pipe'){mat=M(0x4a5056,.35,.45);geo=new THREE.CylinderGeometry(.065,.065,.85,8)}
+ else {mat=M(0x303943,.35,.5);geo=new THREE.BoxGeometry(.18,.16,.72)}
+ const mesh=new THREE.Mesh(geo,mat);mesh.castShadow=true;g.add(mesh);
+ if(kind==='bottle'){const cap=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.06,8),M(0xe60012));cap.position.y=.23;g.add(cap)}
+ g.position.set(x,.28,z);scene.add(g);worldItems.push({g,kind,available:true});return g
+}
+makePickup('brick',-2,-1);makePickup('bottle',3,2);makePickup('pipe',5,-5);makePickup('brick',18,1);makePickup('bottle',22,-2);makePickup('pipe',26,5);makePickup('brick',38,1);makePickup('bottle',43,-2);
 const ui={overlay:document.getElementById('overlay'),clock:document.getElementById('clock'),left:document.getElementById('left'),ammo:document.getElementById('ammo'),toast:document.getElementById('toast'),room:document.getElementById('room')};
-let yaw=0,pitch=0,keys={},sim=0,ammo=12,reserve=60,alive=true,paused=true,shootCooldown=0,reloadLeft=0,toastTimer=0,roomWon=false;const clockNow=()=>{ui.clock.textContent='SIM '+sim.toFixed(2).padStart(5,'0');ui.left.textContent='HOSTILES: '+enemies.filter(e=>e.alive).length;ui.ammo.textContent=ammo+' / '+reserve;const sector=camera.position.x<8?'SECTOR 01 — ENTRY':camera.position.x<28?'SECTOR 02 — PROCESSING':'SECTOR 03 — EXTRACTION';ui.room.textContent=sector};
+let yaw=0,pitch=0,keys={},sim=0,ammo=0,reserve=0,alive=true,paused=true,shootCooldown=0,reloadLeft=0,toastTimer=0,roomWon=false;const clockNow=()=>{ui.clock.textContent='SIM '+sim.toFixed(2).padStart(5,'0');ui.left.textContent='HOSTILES: '+enemies.filter(e=>e.alive).length;ui.ammo.textContent=weapon?(weaponAmmo+' / '+weaponReserve):heldItem?heldItem.kind.toUpperCase()+' IN HAND':'NO WEAPON';document.getElementById('weaponName').textContent=weapon?weapon.name.toUpperCase():heldItem?heldItem.kind.toUpperCase():'EMPTY HANDS';const sector=camera.position.x<8?'SECTOR 01 — ENTRY':camera.position.x<28?'SECTOR 02 — PROCESSING':'SECTOR 03 — EXTRACTION';ui.room.textContent=sector};
 function message(t){ui.toast.textContent=t;toastTimer=1}
-function spawnBullet(origin,direction,speed,owner){const mesh=new THREE.Mesh(bulletGeo,owner==='player'?playerBulletMat:enemyBulletMat);mesh.position.copy(origin);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());const glow=new THREE.Mesh(new THREE.CylinderGeometry(.095,.095,.24,6),new THREE.MeshBasicMaterial({color:0x17191c}));glow.position.y=.72;mesh.add(glow);scene.add(mesh);projectiles.push({mesh,vel:direction.clone().normalize().multiplyScalar(speed),owner,life:4})}
+function spawnBullet(origin,direction,speed,owner){
+ const group=new THREE.Group();group.position.copy(origin);group.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());
+ const core=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,2.15,8),owner==='player'?playerBulletMat:enemyBulletMat);group.add(core);
+ const tip=new THREE.Mesh(new THREE.ConeGeometry(.12,.32,8),new THREE.MeshBasicMaterial({color:0x181b20}));tip.position.y=1.15;group.add(tip);
+ const glow=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,2.25,8),new THREE.MeshBasicMaterial({color:0xff3846,transparent:true,opacity:.28}));group.add(glow);
+ scene.add(group);projectiles.push({mesh:group,vel:direction.clone().normalize().multiplyScalar(speed),owner,life:3.5});
+}
+function dropItem(kind,pos,gunName=''){
+ const g=new THREE.Group();let material=M(kind==='weapon'?0x272d33:kind==='pipe'?0x59616a:0xb5b9bd,.4,.25);
+ const shape=new THREE.Mesh(kind==='weapon'?new THREE.BoxGeometry(.16,.16,.82):kind==='pipe'?new THREE.CylinderGeometry(.07,.07,.8,8):new THREE.BoxGeometry(.45,.24,.3),material);g.add(shape);g.position.copy(pos);g.position.y=Math.max(.3,g.position.y);scene.add(g);worldItems.push({g,kind:kind==='weapon'?'weapon':kind,available:true,gunName});
+}
+function nearestPickup(){let best=null,dist=2.6;for(const item of worldItems){if(!item.available)continue;const d=item.g.position.distanceTo(camera.position);if(d<dist){best=item;dist=d}}return best}
+function pickup(){if(paused||!alive)return;const item=nearestPickup();if(!item){message('NOTHING IN REACH');return}if(heldItem||weapon){message('HANDS FULL — THROW FIRST');return}item.available=false;scene.remove(item.g);heldItem=item;
+ if(item.kind==='weapon'){weapon={name:item.gunName||'RIFLE'};weaponAmmo=8;weaponReserve=16;heldItem=null;showGun();message('WEAPON PICKED UP')}
+ else{showHeldProp();message(item.kind.toUpperCase()+' PICKED UP')}
+ advance(.18);clockNow()
+}
+function showGun(){gun.visible=true;gun.scale.setScalar(1);document.getElementById('weaponName').textContent=weapon.name.toUpperCase()}
+function showHeldProp(){gun.visible=false}
+function throwHeld(){if(paused||!alive)return;if(!heldItem&&!weapon){message('NOTHING TO THROW');return}const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);const pos=camera.position.clone().add(dir.clone().multiplyScalar(.8));let kind=heldItem?heldItem.kind:'weapon';const obj=new THREE.Mesh(kind==='weapon'?new THREE.BoxGeometry(.18,.16,.8):kind==='pipe'?new THREE.CylinderGeometry(.07,.07,.85,8):kind==='bottle'?new THREE.CylinderGeometry(.1,.13,.42,8):new THREE.BoxGeometry(.48,.25,.3),M(kind==='weapon'?0x303943:kind==='bottle'?0x4e9b9c:0x9ba2a7,.4,.2));obj.position.copy(pos);obj.castShadow=true;scene.add(obj);thrownItems.push({mesh:obj,vel:dir.multiplyScalar(heldItem?17:20).add(new THREE.Vector3(0,2,0)),spin:new THREE.Vector3(8,5,4),kind,life:5});heldItem=null;weapon=null;weaponAmmo=0;weaponReserve=0;gun.visible=false;advance(.22);message('THROWN');clockNow()
+}
 function removeBullet(i){scene.remove(projectiles[i].mesh);projectiles.splice(i,1)}
 function die(){if(!alive)return;alive=false;paused=true;ui.overlay.style.display='grid';ui.overlay.querySelector('h1').textContent='YOU DIED';ui.overlay.querySelector('p').innerHTML='SIMULATION TIME: '+sim.toFixed(2)+' SECONDS<br>One mistake. Restart the facility.';document.getElementById('start').textContent='RESTART MISSION';document.exitPointerLock?.()}
 function win(){if(roomWon)return;roomWon=true;paused=true;ui.overlay.style.display='grid';ui.overlay.querySelector('h1').textContent='FACILITY CLEARED';ui.overlay.querySelector('p').textContent='All eight hostiles eliminated. Simulation time: '+sim.toFixed(2)+' seconds.';document.getElementById('start').textContent='PLAY AGAIN';document.exitPointerLock?.()}
@@ -63,23 +97,31 @@ function advance(dt){if(dt<=0)return;sim+=dt;
   // Enemies only pursue when the player is in their sector or nearby corridor.
   const sameZone=Math.abs(camera.position.x-e.g.position.x)<13;
   if(sameZone&&dist>4.2){const step=Math.min(dt*.62,dist-4.2);e.g.position.x+=dx/dist*step;e.g.position.z+=dz/dist*step;e.g.rotation.y=Math.atan2(dx,dz);e.move=1}else{e.move=0}
-  e.legL.rotation.x=Math.sin(e.phase)*.42*e.move;e.legR.rotation.x=-Math.sin(e.phase)*.42*e.move;e.armL.rotation.x=-.35+Math.sin(e.phase)*.18*e.move;e.armR.rotation.x=-.55;
+  e.legL.rotation.x=Math.sin(e.phase)*.48*e.move;e.legR.rotation.x=-Math.sin(e.phase)*.48*e.move;e.kneeL.rotation.x=Math.max(0,-Math.sin(e.phase))*.65*e.move;e.kneeR.rotation.x=Math.max(0,Math.sin(e.phase))*.65*e.move;e.armL.rotation.x=-.5+Math.sin(e.phase)*.28*e.move;e.armR.rotation.x=-.65-Math.sin(e.phase)*.22*e.move;e.elbowL.rotation.x=-.45;e.elbowR.rotation.x=-.5;
   if(e.fire<=0&&sameZone&&dist<19){e.fire=(e.type==='SNIPER'?2.7:1.7)+Math.random()*1.2;const origin=e.g.position.clone().add(new THREE.Vector3(0,1.35,0));const target=camera.position.clone().add(new THREE.Vector3(0,-.12,0));const dir=target.sub(origin).normalize();spawnBullet(origin,dir,e.type==='SNIPER'?20:14,'enemy')}
  }
  for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];const old=p.mesh.position.clone();p.mesh.position.addScaledVector(p.vel,dt);p.life-=dt;
-  if(p.owner==='enemy'&&p.mesh.position.distanceTo(camera.position)<.48){removeBullet(i);die();return}
-  let hitTarget=false;if(p.owner==='player'){for(const e of enemies){if(!e.alive)continue;const box=new THREE.Box3().setFromObject(e.g).expandByScalar(.13);if(box.containsPoint(p.mesh.position)){e.alive=false;scene.remove(e.g);hitTarget=true;message('TARGET DOWN');break}}}
+  if(p.owner==='enemy'&&p.mesh.position.distanceTo(camera.position)<.58){removeBullet(i);die();return}
+  let hitTarget=false;if(p.owner==='player'){for(const e of enemies){if(!e.alive)continue;const box=new THREE.Box3().setFromObject(e.g).expandByScalar(.13);if(box.containsPoint(p.mesh.position)){const dropPos=e.g.position.clone().add(new THREE.Vector3(.45,.45,.2));dropItem('weapon',dropPos,e.type==='SNIPER'?'SNIPER RIFLE':'RIFLE');e.alive=false;scene.remove(e.g);hitTarget=true;message('TARGET DOWN — WEAPON DROPPED');break}}}
   if(hitTarget||p.life<=0)removeBullet(i);
+ }
+ for(let i=thrownItems.length-1;i>=0;i--){const o=thrownItems[i];o.vel.y-=9.8*dt;o.mesh.position.addScaledVector(o.vel,dt);o.mesh.rotation.x+=o.spin.x*dt;o.mesh.rotation.y+=o.spin.y*dt;o.life-=dt;
+  if(o.mesh.position.y<.18){o.mesh.position.y=.18;o.vel.y=Math.abs(o.vel.y)*.32;o.vel.x*=.72;o.vel.z*=.72}
+  let hit=false;for(const e of enemies){if(!e.alive)continue;if(o.mesh.position.distanceTo(e.g.position.clone().add(new THREE.Vector3(0,1,0)))<.8){const dropPos=e.g.position.clone().add(new THREE.Vector3(.45,.45,.2));dropItem('weapon',dropPos,'RIFLE');e.alive=false;scene.remove(e.g);hit=true;message('IMPACT — TARGET DOWN');break}}
+  if(hit||o.life<=0){scene.remove(o.mesh);thrownItems.splice(i,1)}
+ }
  }
  clockNow();if(enemies.every(e=>!e.alive))win()
 }
-function shoot(){if(paused||!alive||reloadLeft>0||shootCooldown>0)return;if(ammo<=0){message('RELOAD');return}ammo--;shootCooldown=.25;const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);const origin=camera.position.clone().add(dir.clone().multiplyScalar(.65));spawnBullet(origin,dir,34,'player');advance(.13);clockNow()}
-function reload(){if(paused||reloadLeft>0||ammo===12||reserve<=0)return;const n=Math.min(12-ammo,reserve);ammo+=n;reserve-=n;reloadLeft=1.1;advance(1.1);reloadLeft=0;message('RELOADED');clockNow()}
+function shoot(){if(paused||!alive||!weapon||reloadLeft>0||shootCooldown>0)return;if(weaponAmmo<=0){message('EMPTY — R TO RELOAD');return}weaponAmmo--;shootCooldown=.32;const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);const origin=camera.position.clone().add(dir.clone().multiplyScalar(.85));spawnBullet(origin,dir,38,'player');
+ const flash=new THREE.PointLight(0xffdf9a,5,4);flash.position.copy(origin);scene.add(flash);setTimeout(()=>scene.remove(flash),65);
+ advance(.16);clockNow()}
+function reload(){if(paused||!weapon||reloadLeft>0||weaponAmmo>=8||weaponReserve<=0)return;const n=Math.min(8-weaponAmmo,weaponReserve);weaponAmmo+=n;weaponReserve-=n;reloadLeft=1.1;advance(1.1);reloadLeft=0;message('RELOADED');clockNow()}
 function restart(){location.reload()}
 document.getElementById('start').onclick=()=>{if(!alive||roomWon)restart();paused=false;ui.overlay.style.display='none';renderer.domElement.requestPointerLock()};
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&alive&&!paused){paused=true;ui.overlay.style.display='grid';ui.overlay.querySelector('h1').textContent='PAUSED';ui.overlay.querySelector('p').textContent='The simulation is frozen. Return when ready.';document.getElementById('start').textContent='RESUME'}});
 document.addEventListener('mousemove',e=>{if(paused)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=Math.max(-1.48,Math.min(1.48,pitch));camera.rotation.set(pitch,yaw,0,'YXZ')});
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')reload()});document.addEventListener('keyup',e=>keys[e.code]=false);document.addEventListener('mousedown',e=>{if(e.button===0&&!paused)shoot()});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')reload();if(e.code==='KeyE')pickup();if(e.code==='KeyF')throwHeld()});document.addEventListener('keyup',e=>keys[e.code]=false);document.addEventListener('mousedown',e=>{if(e.button===0&&!paused)shoot();if(e.button===2&&!paused)throwHeld()});document.addEventListener('contextmenu',e=>e.preventDefault());
 function canMove(nx,nz){if(nz<-7.25||nz>7.25)return false;const inDoor=Math.abs(nz)<1.8;if(nx<-7.25||nx>47.25)return false;if(nx>7.25&&nx<12.75&&!inDoor)return false;if(nx>27.25&&nx<32.75&&!inDoor)return false;return true}
 function loop(){requestAnimationFrame(loop);if(!paused&&alive){
  const sprint=keys.ShiftLeft||keys.ShiftRight,speed=sprint?5.2:3.15;let dx=0,dz=0;if(keys.KeyW)dz-=1;if(keys.KeyS)dz+=1;if(keys.KeyA)dx-=1;if(keys.KeyD)dx+=1;const len=Math.hypot(dx,dz);
