@@ -22,8 +22,7 @@ function light(x,z,color=0xff4540){const l=new THREE.PointLight(color,25,15,2);l
 function room(cx,name){floor(cx,0,16,16);block(cx,2,-8,16,4,.45);block(cx-8,2,-5,.45,4,6);block(cx-8,2,5,.45,4,6);block(cx+8,2,-5,.45,4,6);block(cx+8,2,5,.45,4,6);block(cx,4,0,16,.25,16,dark);for(let z of [-5,5]){block(cx-3,3.93,z,2,.08,.3,trim);block(cx+3,3.93,z,2,.08,.3,trim)}light(cx-4,-5);light(cx+4,4,0xffa34d)}
 // Three rooms and connecting corridors. The side openings are deliberately left clear.
 room(0);room(20);room(40);
-// Close the side walls except for 4-unit-wide doorways.
-for(const cx of [0,20,40]){block(cx-8,2,0,.45,4,6);block(cx-8,2,0,.45,4,6)}
+// Side-wall segments leave clear doorways into each connecting corridor.
 // corridor floor and side walls
 floor(10,0,4,4);floor(30,0,4,4);block(10,2,-2,4,4,.35);block(10,2,2,4,4,.35);block(30,2,-2,4,4,.35);block(30,2,2,4,4,.35);
 for(const x of [10,30]){light(x,0,0xff3a35);block(x,3.85,0,3.5,.12,.16,steel)}
