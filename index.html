@@ -19,7 +19,7 @@ const concrete=M(0x555b60),dark=M(0x272e34),floorMat=M(0x42494d),trim=M(0x858b8d
 function block(x,y,z,w,h,d,material=concrete){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
 function floor(x,z,w,d){const o=new THREE.Mesh(new THREE.PlaneGeometry(w,d),floorMat);o.rotation.x=-Math.PI/2;o.position.set(x,0,z);o.receiveShadow=true;scene.add(o)}
 function light(x,z,color=0xff4540){const l=new THREE.PointLight(color,25,15,2);l.position.set(x,3.45,z);scene.add(l);const bulb=new THREE.Mesh(new THREE.BoxGeometry(.55,.08,.22),new THREE.MeshBasicMaterial({color}));bulb.position.set(x,3.85,z);scene.add(bulb)}
-function room(cx,name){floor(cx,0,16,16);block(cx,2,-8,16,4,.45);block(cx-8,2,0,.45,4,16);block(cx+8,2,0,.45,4,16);block(cx,4,0,16,.25,16,dark);for(let z of [-5,5]){block(cx-3,3.93,z,2,.08,.3,trim);block(cx+3,3.93,z,2,.08,.3,trim)}light(cx-4,-5);light(cx+4,4,0xffa34d)}
+function room(cx,name){floor(cx,0,16,16);block(cx,2,-8,16,4,.45);block(cx-8,2,-5,.45,4,6);block(cx-8,2,5,.45,4,6);block(cx+8,2,-5,.45,4,6);block(cx+8,2,5,.45,4,6);block(cx,4,0,16,.25,16,dark);for(let z of [-5,5]){block(cx-3,3.93,z,2,.08,.3,trim);block(cx+3,3.93,z,2,.08,.3,trim)}light(cx-4,-5);light(cx+4,4,0xffa34d)}
 // Three rooms and connecting corridors. The side openings are deliberately left clear.
 room(0);room(20);room(40);
 // Close the side walls except for 4-unit-wide doorways.
@@ -69,8 +69,8 @@ function advance(dt){if(dt<=0)return;sim+=dt;
  }
  for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];const old=p.mesh.position.clone();p.mesh.position.addScaledVector(p.vel,dt);p.life-=dt;
   if(p.owner==='enemy'&&p.mesh.position.distanceTo(camera.position)<.48){removeBullet(i);die();return}
-  if(p.owner==='player'){for(const e of enemies){if(!e.alive)continue;const box=new THREE.Box3().setFromObject(e.g).expandByScalar(.13);if(box.containsPoint(p.mesh.position)){e.alive=false;scene.remove(e.g);removeBullet(i);message('TARGET DOWN');break}}}
-  if(i<projectiles.length&&p.life<=0)removeBullet(i);
+  let hitTarget=false;if(p.owner==='player'){for(const e of enemies){if(!e.alive)continue;const box=new THREE.Box3().setFromObject(e.g).expandByScalar(.13);if(box.containsPoint(p.mesh.position)){e.alive=false;scene.remove(e.g);hitTarget=true;message('TARGET DOWN');break}}}
+  if(hitTarget||p.life<=0)removeBullet(i);
  }
  clockNow();if(enemies.every(e=>!e.alive))win()
 }
