@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZERO SECOND</title>
+<style>
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#080a0d;color:#e8edf2;font:14px Arial,sans-serif}
+#hud{position:fixed;inset:0;pointer-events:none;text-shadow:0 2px 5px #000}
+#top{position:absolute;top:18px;left:20px;right:20px;display:flex;justify-content:space-between;font-weight:bold;letter-spacing:2px}
+#center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;color:#fff}
+#cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;color:#fff}
+#bottom{position:absolute;bottom:20px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:end}
+#ammo{font-size:24px;font-weight:bold}#help{color:#b9c0c8;line-height:1.6;text-align:right}
+#overlay{position:fixed;inset:0;background:rgba(4,6,9,.92);display:grid;place-items:center;text-align:center;z-index:5}
+.panel{max-width:560px;padding:35px}h1{font-size:clamp(48px,10vw,90px);letter-spacing:9px;margin:0;color:#f04444}p{color:#c2c8d0;line-height:1.6}
+button{background:#d93434;border:0;color:white;padding:14px 28px;font-weight:bold;letter-spacing:2px;cursor:pointer;font-size:15px}
+#toast{position:absolute;top:22%;width:100%;text-align:center;color:#ff5555;font-weight:bold;letter-spacing:3px}
+</style>
+</head>
+<body>
+<div id="overlay"><div class="panel"><h1>ZERO SECOND</h1><p>TIME ONLY MOVES WHEN YOU DO.<br>One bullet. One mistake. You're dead.</p><p><b>WASD</b> move · <b>MOUSE</b> look · <b>CLICK</b> shoot · <b>R</b> reload · <b>SHIFT</b> sprint<br>Stand still to freeze the world. Looking around is free.</p><button id="start">ENTER THE ROOM</button></div></div>
+<div id="hud"><div id="top"><span>ZERO SECOND</span><span id="clock">SIM TIME 00.00</span><span id="left">HOSTILES: 3</span></div><div id="cross">+</div><div id="toast"></div><div id="bottom"><div><div style="font-size:11px;letter-spacing:3px;color:#aaa">PISTOL</div><div id="ammo">12 / 48</div></div><div id="help">WASD MOVE · SHIFT SPRINT<br>CLICK FIRE · R RELOAD · ESC PAUSE</div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(()=>{
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b20);scene.fog=new THREE.Fog(0x171b20,15,38);
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,100);camera.position.set(0,1.7,7);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0x9aaabb,0x292323,1.4));const lamp=new THREE.DirectionalLight(0xffffff,2);lamp.position.set(-4,9,5);lamp.castShadow=true;scene.add(lamp);
+const mat=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(24,24),mat(0x55585b));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+function wall(x,y,z,w,h,d,c=0x777b80){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+wall(0,2,-8,18,4,.5);wall(-9,2,0,.5,4,16);wall(9,2,0,.5,4,16);wall(0,2,8,18,4,.5);
+for(let i=0;i<5;i++){wall(-5+i*2.5,.65,-2,1.5,1.3,1.2,0x45494e)}
+// red industrial lights
+for(const x of [-6,0,6]){const l=new THREE.PointLight(0xb52222,16,9);l.position.set(x,3.5,-5);scene.add(l)}
+const gun=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(.18,.16,.55),mat(0x202329));body.position.set(.34,-.28,-.55);gun.add(body);const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.35,10),mat(0x55585c));barrel.rotation.x=Math.PI/2;barrel.position.set(.34,-.25,-.9);gun.add(barrel);camera.add(gun);scene.add(camera);
+let yaw=0,pitch=0,keys={},running=false,sim=0,ammo=12,reserve=48,alive=true,paused=true,shootCooldown=0,reloadLeft=0,moveDistance=0;
+const enemies=[];const enemyMat=mat(0x8d2525);const headMat=mat(0xb43a35);
+function enemy(x,z){const g=new THREE.Group();const torso=new THREE.Mesh(new THREE.BoxGeometry(.55,.85,.35),enemyMat);torso.position.y=.85;torso.castShadow=true;g.add(torso);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),headMat);head.position.y=1.42;g.add(head);g.position.set(x,0,z);scene.add(g);enemies.push({g,alive:true,aim:0,fire:1.5+Math.random(),phase:0})}
+enemy(-4,-5);enemy(3,-5);enemy(5,2);
+const overlay=document.getElementById('overlay'),clock=document.getElementById('clock'),left=document.getElementById('left'),ammoEl=document.getElementById('ammo'),toast=document.getElementById('toast');
+function hud(){clock.textContent='SIM TIME '+sim.toFixed(2).padStart(5,'0');left.textContent='HOSTILES: '+enemies.filter(e=>e.alive).length;ammoEl.textContent=ammo+' / '+reserve}
+function freeze(){return !Object.values(keys).some(Boolean)&&reloadLeft<=0&&shootCooldown<=0}
+function advance(dt){sim+=dt;for(const e of enemies){if(!e.alive)continue;const dx=camera.position.x-e.g.position.x,dz=camera.position.z-e.g.position.z,dist=Math.hypot(dx,dz);e.fire-=dt;e.aim=Math.min(1,e.aim+dt*.55);if(dist>3.3){e.g.position.x+=dx/dist*dt*.42;e.g.position.z+=dz/dist*dt*.42;e.g.rotation.y=Math.atan2(dx,dz)}if(e.fire<=0&&dist<15){e.fire=2.2+Math.random()*1.2;const target=new THREE.Vector3(camera.position.x,1.5,camera.position.z);const origin=e.g.position.clone().add(new THREE.Vector3(0,1.25,0));const dir=target.sub(origin).normalize();const ray=new THREE.Raycaster(origin,dir,0,dist);if(ray.ray.direction.dot(new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)))>.985){die()}}}}
+function die(){if(!alive)return;alive=false;paused=true;overlay.style.display='grid';overlay.querySelector('h1').textContent='YOU DIED';overlay.querySelector('p').innerHTML='SIMULATION TIME: '+sim.toFixed(2)+' SECONDS<br>One mistake. Try again.';document.getElementById('start').textContent='RESTART ROOM';document.exitPointerLock?.()}
+function win(){paused=true;overlay.style.display='grid';overlay.querySelector('h1').textContent='ROOM CLEARED';overlay.querySelector('p').textContent='All hostiles eliminated. Simulation time: '+sim.toFixed(2)+' seconds.';document.getElementById('start').textContent='PLAY AGAIN';document.exitPointerLock?.()}
+function shoot(){if(paused||!alive||reloadLeft>0||shootCooldown>0)return;if(ammo<=0){toast.textContent='EMPTY';setTimeout(()=>toast.textContent='',500);return}ammo--;shootCooldown=.22;advance(.22);const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2(0,0),camera);let best=null,bestD=Infinity;for(const e of enemies){if(!e.alive)continue;const box=new THREE.Box3().setFromObject(e.g);const hit=ray.ray.intersectBox(box,new THREE.Vector3());if(hit){const d=hit.distanceTo(camera.position);if(d<bestD){best=e;bestD=d}}}if(best){best.alive=false;scene.remove(best.g);toast.textContent='TARGET DOWN';setTimeout(()=>toast.textContent='',450)}else{toast.textContent='';}hud();if(enemies.every(e=>!e.alive))win()}
+function reload(){if(paused||reloadLeft>0||ammo===12||reserve<=0)return;reloadLeft=1.5;advance(1.5);const n=Math.min(12-ammo,reserve);ammo+=n;reserve-=n;reloadLeft=0;hud()}
+document.getElementById('start').onclick=()=>{if(!alive||enemies.every(e=>!e.alive))location.reload();paused=false;overlay.style.display='none';renderer.domElement.requestPointerLock()};
+document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&alive){paused=true;overlay.style.display='grid';overlay.querySelector('h1').textContent='PAUSED';overlay.querySelector('p').textContent='Click below to return to the room.';document.getElementById('start').textContent='RESUME'}});
+document.addEventListener('mousemove',e=>{if(paused)return;yaw-=e.movementX*.0022;pitch-=e.movementY*.0022;pitch=Math.max(-1.45,Math.min(1.45,pitch));camera.rotation.set(pitch,yaw,0,'YXZ')});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')reload()});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+document.addEventListener('mousedown',e=>{if(e.button===0&&!paused)shoot()});
+function loop(){requestAnimationFrame(loop);if(!paused&&alive){const sprint=keys.ShiftLeft||keys.ShiftRight,speed=sprint?5.4:3.2;let dx=0,dz=0;if(keys.KeyW)dz-=1;if(keys.KeyS)dz+=1;if(keys.KeyA)dx-=1;if(keys.KeyD)dx+=1;const len=Math.hypot(dx,dz);if(len){dx/=len;dz/=len;const wx=(dx*Math.cos(yaw)+dz*Math.sin(yaw))*speed/60,wz=(-dx*Math.sin(yaw)+dz*Math.cos(yaw))*speed/60;camera.position.x+=wx;camera.position.z+=wz;camera.position.x=Math.max(-8,Math.min(8,camera.position.x));camera.position.z=Math.max(-7.5,Math.min(7.5,camera.position.z));advance(Math.hypot(wx,wz)/(sprint?5.4:3.2)*.5)}if(shootCooldown>0)shootCooldown=Math.max(0,shootCooldown-1/60);if(reloadLeft>0)reloadLeft=Math.max(0,reloadLeft-1/60);hud()}renderer.render(scene,camera)}
+loop();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+})();
+</script></body></html>
